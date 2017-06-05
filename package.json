@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/PaulMilla/LonghornSalsa-Backend#readme",
   "dependencies": {
+    "cors": "^2.8.3",
     "express": "^4.15.2",
     "fb": "^2.0.0"
   },

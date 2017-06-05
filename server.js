@@ -1,4 +1,5 @@
 var express = require('express');
+var cors = require('cors');
 var facebook = require('fb');
 
 var FB = new facebook.Facebook({
@@ -24,6 +25,7 @@ FB.api('oauth/access_token', options, function (res) {
 
 
 var app = express();
+app.use(cors());
 
 //////////// Routes /////////////////
 app.get('/', function(req, res) {
