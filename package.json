@@ -1,0 +1,30 @@
+{
+  "name": "longhornsalsa-backend",
+  "version": "1.0.0",
+  "description": "Quick and dirty ETL for Longhorn Salsa FB Page",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaulMilla/LonghornSalsa-Backend.git"
+  },
+  "keywords": [
+    "longhornsalsa"
+  ],
+  "author": "Paul Milla",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PaulMilla/LonghornSalsa-Backend/issues"
+  },
+  "homepage": "https://github.com/PaulMilla/LonghornSalsa-Backend#readme",
+  "dependencies": {
+    "express": "^4.15.2",
+    "fb": "^2.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.4.0"
+  }
+}
