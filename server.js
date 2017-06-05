@@ -1,7 +1,6 @@
 var express = require('express');
 var facebook = require('fb');
 
-var app = express();
 var FB = new facebook.Facebook({
     appId: process.env.APP_ID,
     appSecret: process.env.APP_SECRET});
@@ -24,6 +23,8 @@ FB.api('oauth/access_token', options, function (res) {
 });
 
 
+var app = express();
+
 //////////// Routes /////////////////
 app.get('/', function(req, res) {
     res.send("Hello World! <a href='/events/1700480319978856'>ClickMe!</a>");
@@ -33,9 +34,13 @@ app.get('/events', function(req, res) {
     FB.api('LonghornSalsa/events', function(fb_res) {
         if(!fb_res || fb_res.error) {
             console.log(!fb_res ? 'error occurred' : fb_res.error);
+            res.status(500)
+               .json(fb_res.error);
             return;
         }
-        res.json(fb_res);
+
+        res.status(200)
+           .json(fb_res);
     })
 });
 
@@ -44,9 +49,13 @@ app.get('/events/:id', function(req, res) {
     FB.api('/'+eventId, function(fb_res) {
         if(!fb_res || fb_res.error) {
             console.log(!fb_res ? 'error occurred' : fb_res.error);
+            res.status(500)
+               .json(fb_res.error);
             return;
         }
-        res.json(fb_res);
+
+        res.status(200)
+           .json(fb_res);
     })
 });
 
