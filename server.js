@@ -61,6 +61,23 @@ app.get('/events/:id', function(req, res) {
     })
 });
 
+// TODO: Allow this endpoint to auto redirect just like the real endpoint
+// If this is ever turned into a real ETL then this info could be returned with the event
+app.get('/:eventId/picture', function(req, res) {
+    let endpoint = '/'+req.params.eventId+'/picture?redirect=false&type=large';
+    console.log("endpoint: "+endpoint);
+    FB.api(endpoint, function(fb_res) {
+        if (!fb_res || fb_res.error) {
+            console.log(!fb_res ? 'error occurred' : fb_res.error);
+            res.status(500)
+               .send(fb_res.error);
+            return;
+        }
+
+        res.status(200)
+           .send(fb_res);
+    })
+})
 
 //////////// Listener /////////////////
 app.listen(port, function() {
