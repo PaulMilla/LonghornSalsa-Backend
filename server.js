@@ -53,58 +53,46 @@ else {
 
 console.log('Using access token: '+FB.options('accessToken'));
 
+
 //////////// Routes /////////////////
-// LonghornSalsa PageID = 466676286853256
-app.get('/', function(req, res) {
-    res.send("Hello World! <a href='/events/200333530611671'>ClickMe!</a>");
-});
+let map = new Map();
+map.set('/', (req) => '/LonghornSalsa');
+map.set('/events', (req) => '/LonghornSalsa/events');
+map.set('/events/:id', (req) => `/${req.params.id}`);
 
-app.get('/events', function(req, res) {
-    FB.api('LonghornSalsa/events', function(fb_res) {
-        if(!fb_res || fb_res.error) {
-            console.log(!fb_res ? 'error occurred' : fb_res.error);
-            res.status(500)
-               .json(fb_res.error);
-            return;
-        }
+for (const [myEndpoint, fbEndpointSelector] of map.entries()) {
+    app.get(myEndpoint, (req, res) => {
+        FB.api(fbEndpointSelector(req), (fb_res) => {
+            if(!fb_res || fb_res.error) {
+                console.log(!fb_res ? 'error occurred' : fb_res.error);
+                res.status(500)
+                   .json(fb_res.error);
+                return;
+            }
 
-        res.status(200)
-           .json(fb_res);
-    })
-});
-
-app.get('/events/:id', function(req, res) {
-    let eventId = req.params.id;
-    FB.api('/'+eventId, function(fb_res) {
-        if(!fb_res || fb_res.error) {
-            console.log(!fb_res ? 'error occurred' : fb_res.error);
-            res.status(500)
-               .json(fb_res.error);
-            return;
-        }
-
-        res.status(200)
-           .json(fb_res);
-    })
-});
+            res.status(200)
+               .json(fb_res);
+        })
+    });
+}
 
 // TODO: Allow this endpoint to auto redirect just like the real endpoint
 // If this is ever turned into a real ETL then this info could be returned with the event
-app.get('/:eventId/picture', function(req, res) {
-    let endpoint = '/'+req.params.eventId+'/picture?redirect=false&type=large';
-    console.log("endpoint: "+endpoint);
-    FB.api(endpoint, function(fb_res) {
-        if (!fb_res || fb_res.error) {
+/*
+app.get('/:eventId/picture', (req, res) => {
+    FB.api(`/${req.params.eventId}/picture?redirect=false&type=large`, function (fb_res) {
+        if(!fb_res || fb_res.error) {
             console.log(!fb_res ? 'error occurred' : fb_res.error);
             res.status(500)
-               .send(fb_res.error);
+               .json(fb_res.error);
             return;
         }
 
         res.status(200)
-           .send(fb_res);
+           .json(fb_res);
     })
-})
+});
+*/
 
 //////////// Listener /////////////////
 app.listen(port, function() {
