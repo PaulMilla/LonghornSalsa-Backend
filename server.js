@@ -60,9 +60,13 @@ map.set('/', (req) => '/LonghornSalsa');
 map.set('/events', (req) => '/LonghornSalsa/events');
 map.set('/events/:id', (req) => `/${req.params.id}`);
 
+// TODO: Allow this endpoint to auto redirect just like the real endpoint
+// If this is ever turned into a real ETL then this info could be returned with the event
+map.set('/:eventId/picture', (req) => `/${req.params.eventId}/picture?redirect=false&type=large`);
+
 for (const [myEndpoint, fbEndpointSelector] of map.entries()) {
     app.get(myEndpoint, (req, res) => {
-        FB.api(fbEndpointSelector(req), (fb_res) => {
+        FB.api(fbEndpointSelector(req), req.query, (fb_res) => {
             if(!fb_res || fb_res.error) {
                 console.log(!fb_res ? 'error occurred' : fb_res.error);
                 res.status(500)
@@ -75,24 +79,6 @@ for (const [myEndpoint, fbEndpointSelector] of map.entries()) {
         })
     });
 }
-
-// TODO: Allow this endpoint to auto redirect just like the real endpoint
-// If this is ever turned into a real ETL then this info could be returned with the event
-/*
-app.get('/:eventId/picture', (req, res) => {
-    FB.api(`/${req.params.eventId}/picture?redirect=false&type=large`, function (fb_res) {
-        if(!fb_res || fb_res.error) {
-            console.log(!fb_res ? 'error occurred' : fb_res.error);
-            res.status(500)
-               .json(fb_res.error);
-            return;
-        }
-
-        res.status(200)
-           .json(fb_res);
-    })
-});
-*/
 
 //////////// Listener /////////////////
 app.listen(port, function() {
