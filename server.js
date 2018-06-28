@@ -24,6 +24,8 @@ FB.options({ version: 'v3.0' });
  * - On the bottom of the Access Token Info box should be a button "Extend Access Token"
  * - Pressing it will extend the access token from 1 hr to 2 months
  * - Update the ACCESS_TOKEN environment variable to reflect the changes
+ * - Another good resource is the Access Token Tool
+ * - https://developers.facebook.com/tools/accesstoken
  */
 if (process.env.ACCESS_TOKEN) {
     console.log('Using manually provided access token.')
@@ -53,8 +55,25 @@ else {
 
 console.log('Using access token: '+FB.options('accessToken'));
 
-
 //////////// Routes /////////////////
+function addMappingsToAppRouter(map) {
+    for (const [myEndpoint, fbEndpointSelector] of map.entries()) {
+        app.get(myEndpoint, (req, res) => {
+            FB.api(fbEndpointSelector(req), req.query, (fb_res) => {
+                if(!fb_res || fb_res.error) {
+                    console.log(!fb_res ? 'error occurred' : fb_res.error);
+                    res.status(500)
+                       .json(fb_res.error);
+                    return;
+                }
+
+                res.status(200)
+                   .json(fb_res);
+            })
+        });
+    }
+}
+
 let map = new Map();
 map.set('/', (req) => '/LonghornSalsa');
 map.set('/events', (req) => '/LonghornSalsa/events');
@@ -64,21 +83,7 @@ map.set('/events/:id', (req) => `/${req.params.id}`);
 // If this is ever turned into a real ETL then this info could be returned with the event
 map.set('/:eventId/picture', (req) => `/${req.params.eventId}/picture?redirect=false&type=large`);
 
-for (const [myEndpoint, fbEndpointSelector] of map.entries()) {
-    app.get(myEndpoint, (req, res) => {
-        FB.api(fbEndpointSelector(req), req.query, (fb_res) => {
-            if(!fb_res || fb_res.error) {
-                console.log(!fb_res ? 'error occurred' : fb_res.error);
-                res.status(500)
-                   .json(fb_res.error);
-                return;
-            }
-
-            res.status(200)
-               .json(fb_res);
-        })
-    });
-}
+addMappingsToAppRouter(map);
 
 //////////// Listener /////////////////
 app.listen(port, function() {
