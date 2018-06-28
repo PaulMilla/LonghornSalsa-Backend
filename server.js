@@ -56,20 +56,22 @@ else {
 console.log('Using access token: '+FB.options('accessToken'));
 
 //////////// Routes /////////////////
+var fowardFunc = (res) => (fb_res) => {
+    if(!fb_res || fb_res.error) {
+        console.log(!fb_res ? 'error occurred' : fb_res.error);
+        res.status(500)
+           .json(fb_res.error);
+        return;
+    }
+
+    res.status(200)
+       .json(fb_res);
+}
+
 function addMappingsToAppRouter(map) {
     for (const [myEndpoint, fbEndpointSelector] of map.entries()) {
         app.get(myEndpoint, (req, res) => {
-            FB.api(fbEndpointSelector(req), req.query, (fb_res) => {
-                if(!fb_res || fb_res.error) {
-                    console.log(!fb_res ? 'error occurred' : fb_res.error);
-                    res.status(500)
-                       .json(fb_res.error);
-                    return;
-                }
-
-                res.status(200)
-                   .json(fb_res);
-            })
+            FB.api(fbEndpointSelector(req), req.query, forwardFunc(res))
         });
     }
 }
@@ -84,6 +86,12 @@ map.set('/events/:id', (req) => `/${req.params.id}`);
 map.set('/:eventId/picture', (req) => `/${req.params.eventId}/picture?redirect=false&type=large`);
 
 addMappingsToAppRouter(map);
+
+/* Fake endpoints (for now) */
+app.get('/profile/banner', (req, res) => {
+    res.status(200)
+       .json({url: 'https://scontent-dfw5-1.xx.fbcdn.net/v/t1.0-9/12096544_466677993519752_9021474398794254273_n.jpg?_nc_cat=0&oh=3e766cf0d3f56aa864a404061ea8e57d&oe=5BE297A8'})
+})
 
 //////////// Listener /////////////////
 app.listen(port, function() {
