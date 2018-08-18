@@ -56,7 +56,7 @@ else {
 console.log('Using access token: '+FB.options('accessToken'));
 
 //////////// Routes /////////////////
-var fowardFunc = (res) => (fb_res) => {
+var forwardFunc = (res) => (fb_res) => {
     if(!fb_res || fb_res.error) {
         console.log(!fb_res ? 'error occurred' : fb_res.error);
         res.status(500)
